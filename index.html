@@ -9,21 +9,41 @@
             margin: 0;
             overflow: hidden;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             background-color: #70c5ce;
+            font-family: Arial, sans-serif;
         }
         canvas {
             border: 2px solid #000;
         }
+        .start-button {
+            display: none;
+            padding: 10px 20px;
+            background-color: #ffcc00;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            color: #000;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .start-button:hover {
+            background-color: #ffa500;
+        }
     </style>
 </head>
 <body>
+    <button class="start-button" id="startButton">Start Game</button>
     <canvas id="gameCanvas" width="320" height="480"></canvas>
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
+        const startButton = document.getElementById("startButton");
+
+        let gameRunning = false;
 
         // Game variables
         const bird = {
@@ -41,18 +61,17 @@
         const pipeGap = 120;
         let frame = 0;
         let score = 0;
-        let gameRunning = true;
 
         // Load assets
         const birdImage = new Image();
-        birdImage.src = "https://i.imgur.com/o7Y9y6L.png";
+        birdImage.src = "https://upload.wikimedia.org/wikipedia/commons/6/65/Red_sphere_20x20.png";
 
         const pipeImage = new Image();
-        pipeImage.src = "https://i.imgur.com/1zYuIbg.png";
+        pipeImage.src = "https://upload.wikimedia.org/wikipedia/commons/e/e5/Green_rectangle_40x120.png";
 
         // Event listener for bird jump
         document.addEventListener("keydown", (e) => {
-            if (e.code === "Space") {
+            if (e.code === "Space" && gameRunning) {
                 bird.velocity = bird.lift;
             }
         });
@@ -75,7 +94,7 @@
             bird.y += bird.velocity;
 
             if (bird.y + bird.height > canvas.height || bird.y < 0) {
-                gameRunning = false;
+                endGame();
             }
 
             if (frame % 100 === 0) {
@@ -95,7 +114,7 @@
                     bird.x + bird.width > pipe.x &&
                     (bird.y < pipe.top || bird.y + bird.height > pipe.bottom)
                 ) {
-                    gameRunning = false;
+                    endGame();
                 }
             });
 
@@ -127,6 +146,27 @@
             ctx.fillText(`Score: ${score}`, 10, 20);
         }
 
+        // Function to start the game
+        function startGame() {
+            gameRunning = true;
+            bird.y = 150;
+            bird.velocity = 0;
+            pipes.length = 0;
+            frame = 0;
+            score = 0;
+            startButton.style.display = "none";
+            gameLoop();
+        }
+
+        // Function to end the game
+        function endGame() {
+            gameRunning = false;
+            startButton.style.display = "block";
+            ctx.fillStyle = "#000";
+            ctx.font = "30px Arial";
+            ctx.fillText("Game Over", canvas.width / 2 - 70, canvas.height / 2);
+        }
+
         // Main game loop
         function gameLoop() {
             update();
@@ -134,14 +174,19 @@
 
             if (gameRunning) {
                 requestAnimationFrame(gameLoop);
-            } else {
-                ctx.fillStyle = "#000";
-                ctx.font = "30px Arial";
-                ctx.fillText("Game Over", canvas.width / 2 - 70, canvas.height / 2);
             }
         }
 
-        gameLoop();
+        // Start button event listener
+        startButton.addEventListener("click", startGame);
+
+        // Initial screen
+        startButton.style.display = "block";
+        ctx.fillStyle = "#000";
+        ctx.font = "30px Arial";
+        ctx.fillText("Flappy Bird", canvas.width / 2 - 70, canvas.height / 2 - 40);
+        ctx.font = "20px Arial";
+        ctx.fillText("Press Start to Play", canvas.width / 2 - 90, canvas.height / 2);
     </script>
 </body>
 </html>
