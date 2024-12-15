@@ -2,130 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="style.css">
-    <title>Interactive Page</title>
-    <style>
-        /* General styles */
-        body {
-            background-color: #2C2C2C;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            color: #fff;
-            min-height: 100vh;
-        }
-
-        h1 {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 2.5rem;
-        }
-
-        .claim-button {
-            background-color: #FF5733; /* Orange */
-            border: none;
-            color: white;
-            padding: 20px 40px;
-            text-align: center;
-            text-decoration: none;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 20px auto;
-            display: block;
-            transition: background-color 0.3s, transform 0.2s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .fullscreen-button {
-            background-color: #45dbe3; 
-            border: none;
-            color: white;
-            padding: 20px 40px;
-            text-align: center;
-            text-decoration: none;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 20px auto;
-            display: block;
-            transition: background-color 0.3s, transform 0.2s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .claim-button:hover {
-            background-color: #E64A19;
-            transform: translateY(-2px);
-        }
-
-        .button-container {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        .button {
-            background-color: #4CAF50; /* Green */
-            border: none;
-            color: white;
-            padding: 15px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .button:hover {
-            background-color: #45a049;
-            transform: translateY(-2px);
-        }
-
-        /* Responsive styles */
-        @media (max-width: 600px) {
-            .button-container {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .button,
-            .claim-button {
-                width: 100%;
-                max-width: 300px;
-            }
-        }
-    </style>
+    <title>Main Page</title>
 </head>
 <body>
-    <h1>Welcome to My Page</h1>
+    <h1>Lammy</h1>
 
-    <!-- Button triggers fullscreen -->
-    <button class="claim-button" aria-label="Claim reward">
+    <button class="claim-button" aria-label="Claim reward" id="claimButton" onclick="claimingReward()">
         Claim
     </button>
 
-    <button class="fullscreen-button" onclick="triggerFullscreen()" aria-label="Claim and go fullscreen">
+    <p>
+        Points: <span id="pointsDisplay">0</span>
+    </p>
+
+    <button class="fullscreen-button" onclick="triggerFullscreen()" aria-label="Enter fullscreen">
         Fullscreen
     </button>
 
     <div class="button-container">
-        <a href="/action1" class="button" aria-label="Perform Action 1">Button 1</a>
-        <a href="/action2" class="button" aria-label="Perform Action 2">Button 2</a>
-        <a href="/action3" class="button" aria-label="Perform Action 3">Button 3</a>
+        <a href="Bot/html/left_page.html" class="button" aria-label="Go left"><-------</a>
+        <a href="Bot/html/right_page.html" class="button" aria-label="Go right">-------></a>
     </div>
 
     <script>
-        // Function to trigger fullscreen mode
+        // Retrieve points from localStorage or initialize to 0 if not available
+        let points = localStorage.getItem("points") ? parseInt(localStorage.getItem("points")) : 0;
+        document.getElementById("pointsDisplay").textContent = points;
+
         function triggerFullscreen() {
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen();
@@ -134,6 +39,35 @@
             } else if (document.documentElement.msRequestFullscreen) { /* IE11 */
                 document.documentElement.msRequestFullscreen();
             }
+        }
+
+        function claimingReward() {
+            if (document.getElementById("claimButton").disabled) {
+                return; // Prevent further clicks if already claimed
+            }
+
+            points++; // Increment points by 1
+            document.getElementById("pointsDisplay").textContent = points; // Update the displayed points
+
+            // Save points to localStorage
+            localStorage.setItem("points", points);
+
+            document.getElementById("claimButton").disabled = true; // Disable the button after clicking
+
+            // Start the timer countdown
+            let timeLeft = 5; // Timer set to 5 seconds
+            document.getElementById("claimButton").textContent = timeLeft + "s"; // Display the countdown on the button
+
+            // Update the button text every second
+            const timerInterval = setInterval(function() {
+                timeLeft--;
+                document.getElementById("claimButton").textContent = timeLeft + "s"; // Update the button text
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval); // Stop the timer
+                    document.getElementById("claimButton").disabled = false; // Re-enable the button
+                    document.getElementById("claimButton").textContent = "Claim"; // Reset the button text
+                }
+            }, 1000); // Update every second
         }
     </script>
 </body>
