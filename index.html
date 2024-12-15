@@ -3,190 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flappy Bird</title>
+    <link rel="stylesheet" href="style.css">
+    <title>Interactive Page</title>
     <style>
+        /* General styles */
         body {
-            margin: 0;
-            overflow: hidden;
+            background-color: #2C2C2C;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #70c5ce;
+            justify-content: space-between;
+            margin: 0;
             font-family: Arial, sans-serif;
+            color: #fff;
+            min-height: 100vh;
         }
-        canvas {
-            border: 2px solid #000;
+
+        h1 {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 2.5rem;
         }
-        .start-button {
-            display: none;
-            padding: 10px 20px;
-            background-color: #ffcc00;
+
+        .claim-button {
+            background-color: #FF5733; /* Orange */
             border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            color: #000;
+            color: white;
+            padding: 20px 40px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 10px;
             cursor: pointer;
-            margin-bottom: 20px;
+            margin: 20px auto;
+            display: block;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        .start-button:hover {
-            background-color: #ffa500;
+
+        .fullscreen-button {
+            background-color: #45dbe3; 
+            border: none;
+            color: white;
+            padding: 20px 40px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .claim-button:hover {
+            background-color: #E64A19;
+            transform: translateY(-2px);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive styles */
+        @media (max-width: 600px) {
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .button,
+            .claim-button {
+                width: 100%;
+                max-width: 300px;
+            }
         }
     </style>
 </head>
 <body>
-    <button class="start-button" id="startButton">Start Game</button>
-    <canvas id="gameCanvas" width="320" height="480"></canvas>
+    <h1>Welcome to My Page</h1>
+
+    <!-- Button triggers fullscreen -->
+    <button class="claim-button" aria-label="Claim reward">
+        Claim
+    </button>
+
+    <button class="fullscreen-button" onclick="triggerFullscreen()" aria-label="Claim and go fullscreen">
+        Fullscreen
+    </button>
+
+    <div class="button-container">
+        <a href="/action1" class="button" aria-label="Perform Action 1">Button 1</a>
+        <a href="/action2" class="button" aria-label="Perform Action 2">Button 2</a>
+        <a href="/action3" class="button" aria-label="Perform Action 3">Button 3</a>
+    </div>
+
     <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
-        const startButton = document.getElementById("startButton");
-
-        let gameRunning = false;
-
-        // Game variables
-        const bird = {
-            x: 50,
-            y: 150,
-            width: 20,
-            height: 20,
-            gravity: 0.5,
-            lift: -8,
-            velocity: 0
-        };
-
-        const pipes = [];
-        const pipeWidth = 40;
-        const pipeGap = 120;
-        let frame = 0;
-        let score = 0;
-
-        // Load assets
-        const birdImage = new Image();
-        birdImage.src = "https://upload.wikimedia.org/wikipedia/commons/6/65/Red_sphere_20x20.png";
-
-        const pipeImage = new Image();
-        pipeImage.src = "https://upload.wikimedia.org/wikipedia/commons/e/e5/Green_rectangle_40x120.png";
-
-        // Event listener for bird jump
-        document.addEventListener("keydown", (e) => {
-            if (e.code === "Space" && gameRunning) {
-                bird.velocity = bird.lift;
-            }
-        });
-
-        // Function to create a pipe
-        function createPipe() {
-            const pipeTop = Math.random() * (canvas.height / 2);
-            pipes.push({
-                x: canvas.width,
-                top: pipeTop,
-                bottom: pipeTop + pipeGap
-            });
-        }
-
-        // Function to update game state
-        function update() {
-            if (!gameRunning) return;
-
-            bird.velocity += bird.gravity;
-            bird.y += bird.velocity;
-
-            if (bird.y + bird.height > canvas.height || bird.y < 0) {
-                endGame();
-            }
-
-            if (frame % 100 === 0) {
-                createPipe();
-            }
-
-            pipes.forEach((pipe, index) => {
-                pipe.x -= 2;
-                if (pipe.x + pipeWidth < 0) {
-                    pipes.splice(index, 1);
-                    score++;
-                }
-
-                // Collision detection
-                if (
-                    bird.x < pipe.x + pipeWidth &&
-                    bird.x + bird.width > pipe.x &&
-                    (bird.y < pipe.top || bird.y + bird.height > pipe.bottom)
-                ) {
-                    endGame();
-                }
-            });
-
-            frame++;
-        }
-
-        // Function to draw the game
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Draw bird
-            ctx.drawImage(birdImage, bird.x, bird.y, bird.width, bird.height);
-
-            // Draw pipes
-            pipes.forEach((pipe) => {
-                ctx.drawImage(pipeImage, pipe.x, 0, pipeWidth, pipe.top);
-                ctx.drawImage(
-                    pipeImage,
-                    pipe.x,
-                    pipe.bottom,
-                    pipeWidth,
-                    canvas.height - pipe.bottom
-                );
-            });
-
-            // Draw score
-            ctx.fillStyle = "#000";
-            ctx.font = "20px Arial";
-            ctx.fillText(`Score: ${score}`, 10, 20);
-        }
-
-        // Function to start the game
-        function startGame() {
-            gameRunning = true;
-            bird.y = 150;
-            bird.velocity = 0;
-            pipes.length = 0;
-            frame = 0;
-            score = 0;
-            startButton.style.display = "none";
-            gameLoop();
-        }
-
-        // Function to end the game
-        function endGame() {
-            gameRunning = false;
-            startButton.style.display = "block";
-            ctx.fillStyle = "#000";
-            ctx.font = "30px Arial";
-            ctx.fillText("Game Over", canvas.width / 2 - 70, canvas.height / 2);
-        }
-
-        // Main game loop
-        function gameLoop() {
-            update();
-            draw();
-
-            if (gameRunning) {
-                requestAnimationFrame(gameLoop);
+        // Function to trigger fullscreen mode
+        function triggerFullscreen() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) { /* IE11 */
+                document.documentElement.msRequestFullscreen();
             }
         }
-
-        // Start button event listener
-        startButton.addEventListener("click", startGame);
-
-        // Initial screen
-        startButton.style.display = "block";
-        ctx.fillStyle = "#000";
-        ctx.font = "30px Arial";
-        ctx.fillText("Flappy Bird", canvas.width / 2 - 70, canvas.height / 2 - 40);
-        ctx.font = "20px Arial";
-        ctx.fillText("Press Start to Play", canvas.width / 2 - 90, canvas.height / 2);
     </script>
 </body>
 </html>
