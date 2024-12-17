@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="style.css">
+    <title>Interactive Page</title>
+    <style>
+        /* General styles */
+        body {
+            background-color: #2C2C2C;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        h1 {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 2.5rem;
+        }
+
+        .claim-button {
+            background-color: #FF5733;
+            border: none;
+            color: white;
+            padding: 20px 40px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .fullscreen-button {
+            background-color: #45dbe3;
+            border: none;
+            color: white;
+            padding: 20px 40px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .fullscreen-button:hover {
+            background-color: #3ac7d3;
+            transform: translateY(-2px);
+        }
+
+        .claim-button:hover {
+            background-color: #E64A19;
+            transform: translateY(-2px);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 800px) {
+            .fullscreen-button {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to My Page</h1>
+
+    <!-- Claim Button -->
+    <button class="claim-button" aria-label="Claim reward">
+        Claim
+    </button>
+
+    <!-- Fullscreen Button -->
+    <button class="fullscreen-button" onclick="triggerFullscreen()" aria-label="Enter fullscreen">
+        Fullscreen
+    </button>
+
+    <div class="button-container">
+        <a href="Bot/html/index.html" class="button" aria-label="Go to main page">Go to main page</a>
+    </div>
+
+    <script>
+        // Function to trigger fullscreen mode
+        function triggerFullscreen() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) { /* IE11 */
+                document.documentElement.msRequestFullscreen();
+            }
+        }
+    </script>
+</body>
+</html>
