@@ -27,9 +27,19 @@
     </div>
 
     <script>
-        // Retrieve points from localStorage or initialize to 0 if not available
+        // Retrieve points and timer state from localStorage
         let points = localStorage.getItem("points") ? parseInt(localStorage.getItem("points")) : 0;
+        let timeLeft = localStorage.getItem("timeLeft") ? parseInt(localStorage.getItem("timeLeft")) : 0;
+        let isButtonDisabled = localStorage.getItem("isButtonDisabled") === 'true';
+
         document.getElementById("pointsDisplay").textContent = points;
+
+        // Update the button text and state based on saved values
+        if (isButtonDisabled && timeLeft > 0) {
+            document.getElementById("claimButton").disabled = true;
+            document.getElementById("claimButton").textContent = timeLeft + "s";
+            startTimer(timeLeft); // Start the countdown from the saved time
+        }
 
         function triggerFullscreen() {
             if (document.documentElement.requestFullscreen) {
@@ -52,20 +62,28 @@
             // Save points to localStorage
             localStorage.setItem("points", points);
 
-            document.getElementById("claimButton").disabled = true; // Disable the button after clicking
+            // Disable the button and start the timer countdown
+            document.getElementById("claimButton").disabled = true;
+            localStorage.setItem("isButtonDisabled", 'true'); // Store the button disabled state
 
-            // Start the timer countdown
-            let timeLeft = 5; // Timer set to 5 seconds
+            timeLeft = 5; // Timer set to 5 seconds
             document.getElementById("claimButton").textContent = timeLeft + "s"; // Display the countdown on the button
+            startTimer(timeLeft); // Start the countdown timer
+        }
 
+        function startTimer(timeLeft) {
             // Update the button text every second
             const timerInterval = setInterval(function() {
                 timeLeft--;
                 document.getElementById("claimButton").textContent = timeLeft + "s"; // Update the button text
+                localStorage.setItem("timeLeft", timeLeft); // Store the remaining time
+
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval); // Stop the timer
                     document.getElementById("claimButton").disabled = false; // Re-enable the button
                     document.getElementById("claimButton").textContent = "Claim"; // Reset the button text
+                    localStorage.removeItem("timeLeft"); // Clear the timer state from localStorage
+                    localStorage.setItem("isButtonDisabled", 'false'); // Store the button enabled state
                 }
             }, 1000); // Update every second
         }
