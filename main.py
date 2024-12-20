@@ -1,9 +1,8 @@
-import os
-from dotenv import load_dotenv
-import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
-from flask import Flask, jsonify
-import psycopg2
+from dotenv import load_dotenv
+from flask import Flask
+import telebot
+import os
 
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
