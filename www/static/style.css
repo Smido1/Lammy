@@ -7,12 +7,12 @@ body {
     align-items: center;
     justify-content: space-between;
     height: 100vh;
-    background-color: #f0f0f0;
+    background-color: #11111b;
 }
 
 header {
+    margin-top: 3%;
     width: 100%;
-    background-color: #6200ea;
     color: white;
     text-align: center;
     padding: 10px 0;
@@ -27,35 +27,40 @@ main {
     flex-grow: 1;
 }
 
-.button-container {
-    margin-top: 20px;
+.start-button-text {
+    margin-left: 5px;
+    font-size: 24px;
+    letter-spacing: 5px;
+    color: #8BE9FD;
+    filter: drop-shadow(0 0 1px #8BE9FD)
 }
 
 .click-button {
-    background-color: #03a9f4;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 15px 30px;
-    font-size: 20px;
+    padding: 8px;
+    background-color: #11111b;
+    filter: drop-shadow(0 0 0.25rem #8BE9FD);
+    border-radius: 13px;
+    border-color: #8BE9FD;
+    border: #8BE9FD solid 2px;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s;
+    transition: 200ms ease-in-out;
+    transition-property: all;
 }
 
 .click-button:hover {
-    background-color: #0288d1;
+    background-color: #1e1e2e;
+    scale: 1.1;
 }
 
 .level {
-    margin-top: 10px;
+    margin-top: 20px;
     font-size: 18px;
-    color: #333;
+    color: #8BE9FD;
 }
 
 footer {
     width: 100%;
-    background-color: #6200ea;
+    background-color: #44475A;
     color: white;
     text-align: center;
     padding: 10px 0;

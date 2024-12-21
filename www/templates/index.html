@@ -11,65 +11,63 @@
         <div id="score">Score: 0</div>
     </header>
     <main>
-        <div class="button-container">
-            <button class="click-button" id="click-button" onclick="handleClick()">Start</button>
+        <div class="click-button" id="click-button" onclick="handleClick()">
+            <span id="start-button-text" class="start-button-text">START</span>
         </div>
-        <div class="level" id="level">Level: 1</div>
+        <div class="level" id="level">Level 1</div>
     </main>
-    <footer>
+    <!-- <footer>
         <div class="menu">
             <button onclick="showTab('Store')">Store</button>
             <button onclick="showTab('Home')">Home</button>
             <button onclick="showTab('About')">About</button>
         </div>
-    </footer>
+    </footer> -->
     <script>
         let score = 0;
         let level = 1;
+        let disabled = false;
 
         function handleClick() {
             const button = document.getElementById('click-button');
+            const button_text = document.getElementById('start-button-text');
 
             // Увеличиваем очки
-            score++;
-            document.getElementById('score').textContent = `Score: ${score}`;
-
-            // Обновляем уровень каждые 10 очков
-            // if (score % 10 === 0) {
-            //     level++;
-            //     document.getElementById('level').textContent = `Level: ${level}`;
-            // }
-            
-            // Деактивируем кнопку
-            button.disabled = true;
-            let remainingTime = 3;
-            button.textContent = `${remainingTime} seconds`;
-
-            // Таймер
-            const interval = setInterval(() => {
-                remainingTime--;
-                button.textContent = `${remainingTime} seconds`;
-                if (remainingTime <= 0) {
-                    clearInterval(interval);
-                    button.disabled = false;
-                    button.textContent = 'Start';
-                }
-            }, 1000);
-
-            fetch('/update_score', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ score: score, level: level }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Score updated:', data);
-            })
-            .catch(error => {
-                console.error('Error updating score:', error);
-            });
+            if (!disabled) {
+                score++;
+                document.getElementById('score').textContent = `Score: ${score}`;
+                
+                // Деактивируем кнопку
+                disabled = true;
+                let remainingTime = 3;
+                button_text.textContent = `${remainingTime} seconds`;
+                
+                // Таймер
+                const interval = setInterval(() => {
+                    remainingTime--;
+                    button_text.textContent = `${remainingTime} seconds`;
+                    if (remainingTime <= 0) {
+                        clearInterval(interval);
+                        disabled = false;
+                        button_text.textContent = 'START';
+                    }
+                }, 1000);
+                
+                fetch('/update_score', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ score: score, level: level }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Score updated:', data);
+                })
+                .catch(error => {
+                    console.error('Error updating score:', error);
+                });
+            }
         }
     </script>
 </body>
