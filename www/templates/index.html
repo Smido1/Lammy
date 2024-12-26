@@ -28,6 +28,10 @@
         let level = 1;
         let disabled = false;
 
+        let accessToken = "";
+
+        logging();
+
         function handleClick() {
             const button = document.getElementById('click-button');
             const button_text = document.getElementById('start-button-text');
@@ -35,7 +39,7 @@
             // Увеличиваем очки
             if (!disabled) {
                 score++;
-                document.getElementById('score').textContent = `Score: ${score}`;
+                showScore();
                 
                 // Деактивируем кнопку
                 disabled = true;
@@ -52,23 +56,57 @@
                         button_text.textContent = 'START';
                     }
                 }, 1000);
-                
-                fetch('/update_score', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ score: score, level: level }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Score updated:', data);
-                })
-                .catch(error => {
-                    console.error('Error updating score:', error);
-                });
+
+                sendMessageAboutClickToServer();
+            }
+        
+
+        }
+
+        async function logging() {
+            const params = new URLSearchParams(window.location.search);
+            user_id = params.get("user_id"); 
+
+            const response = await fetch('/logging', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id }),
+            });
+            const data = await response.json();
+            console.log(data);
+            accessToken = data.access_token; // Сохраняем токен
+
+            getValues();
+        }
+        async function getValues() {
+            // Отправляем GET-запрос с токеном авторизации
+            const response = await fetch('/get_values', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}` // Вставляем токен в заголовок
+                }
+            });
+
+            const data = await response.json(); // Преобразуем ответ в JSON
+            console.log(data);
+            if (data.status = "success") {
+                score = data.score;
+                showScore();
             }
         }
+        async function sendMessageAboutClickToServer() {
+            const response = await fetch('/click', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}`},
+                body: JSON.stringify({ user_id }),
+            });
+        }
+
+
+        function showScore() {
+            document.getElementById('score').textContent = `Score: ${score}`;
+        }
+
     </script>
 </body>
 </html>

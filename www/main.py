@@ -1,34 +1,91 @@
+#TODO
+# - [ ] Передавать в Flask не сырой id, а UUID, который будет расшифрован и сопоставлен
+
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
 from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///clicker_bot.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+app.config['JWT_SECRET_KEY'] = os.getenv("SECRET_KEY")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DB_URI")
 
-# Модель пользователя
-class User(db.Model):
+db = SQLAlchemy(app)
+jwt = JWTManager(app)
+
+class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    telegram_id = db.Column(db.String(80), unique=True, nullable=False)
-    first_name = db.Column(db.String(80), nullable=False)
-    username = db.Column(db.String(80))
-    score = db.Column(db.Integer, default=0)
-    level = db.Column(db.Integer, default=1)
+    coins = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return f'<User {self.id} - {self.coins}>'
+
 
 @app.route("/")
 def index():
+    # user_id = request.args.get("user_id")
+    # access_token = create_access_token(identity=user_id)
+    
+    # if Users.query.filter(Users.id == user_id).all():
+    #     pass
+    # else:
+    #     try:
+    #         new_user = Users(id=user_id, coins=0)
+    #         db.session.add(new_user)
+    #         db.session.commit()
+    #     except:
+    #         db.session.rollback()
+    
     return render_template("index.html")
 
-@app.route("/update_score", methods=["POST"])
-def update_score():
+@app.route("/logging", methods=["POST"])
+def logging():
     data = request.get_json()
-    score = data.get("score")
-    level = data.get("level")
-    # Здесь можно сохранить данные в базу или файл
-    return jsonify({"status": "success", "message": "Score updated!"})
+    user_id = data.get("user_id")
+    if Users.query.filter_by(id=user_id).first():
+        pass
+    else:
+        try:
+            new_user = Users(id=user_id, coins=0)
+            db.session.add(new_user)
+            db.session.commit()
+        except:
+            db.session.rollback()
+    
+    access_token = create_access_token(identity=user_id)
+    return jsonify({"status": "success", "message": "User logged!", "access_token": access_token})
 
+@app.route("/get_values", methods=["GET"])
+@jwt_required()
+def get_values():
+    current_user_id = get_jwt_identity()  # Получение текущего пользователя из JWT
+    user = Users.query.filter_by(id=current_user_id).first()
+    return jsonify({
+        "status": "success",
+        "score": user.coins
+    })
+
+@app.route("/click", methods=["POST"])
+@jwt_required()
+def click():
+    current_user_id = get_jwt_identity()  # Получение текущего пользователя из JWT
+    try:
+        # print(current_user_id)
+        user = Users.query.filter_by(id=current_user_id).first()
+        # print(user)
+        user.coins += 1
+        # print(user)
+        db.session.commit()
+    except:
+        print("error")
+        db.session.rollback()
+
+    return jsonify({"status": "success"})
 
 if __name__ == "__main__":
     app.run(debug=True, ssl_context='adhoc')
