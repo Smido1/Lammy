@@ -1,5 +1,7 @@
 #TODO
 # - [ ] Передавать в Flask не сырой id, а UUID, который будет расшифрован и сопоставлен
+# - [ ] Сохранять состояние кнопки в БД после нажатия, для препятствия сброса таймера после перезагрузки 
+# - [ ] Вкладки: игра, улучшения, таски, магазин
 
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
