@@ -1,6 +1,7 @@
 #TODO
 # - [ ] Передавать в Flask не сырой id, а UUID, который будет расшифрован и сопоставлен
-# - [ ] Сохранять состояние кнопки в БД после нажатия, для препятствия сброса таймера после перезагрузки 
+# - [x] Сохранять состояние кнопки в БД после нажатия, для препятствия сброса таймера после перезагрузки 
+# - [ ] Получить состояние таймера после перезагрузки
 # - [ ] Вкладки: игра, улучшения, таски, магазин
 
 from telegram import Update
@@ -9,6 +10,7 @@ from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from dotenv import load_dotenv
+from datetime import datetime
 import os
 
 load_dotenv()
@@ -23,6 +25,7 @@ jwt = JWTManager(app)
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     coins = db.Column(db.Integer, nullable=False)
+    last_click = db.Column(db.DateTime)
 
     def __repr__(self):
         return f'<User {self.id} - {self.coins}>'
@@ -77,11 +80,10 @@ def get_values():
 def click():
     current_user_id = get_jwt_identity()  # Получение текущего пользователя из JWT
     try:
-        # print(current_user_id)
         user = Users.query.filter_by(id=current_user_id).first()
-        # print(user)
-        user.coins += 1
-        # print(user)
+        if (datetime.now() - user.last_click).total_seconds() >= 20:
+            user.coins += 1
+            user.last_click = datetime.now()
         db.session.commit()
     except:
         print("error")
