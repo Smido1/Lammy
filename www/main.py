@@ -46,7 +46,20 @@ def index():
     #     except:
     #         db.session.rollback()
     
-    return render_template("index.html")
+    return render_template("game.html")
+
+@app.route("/store")
+def store():
+    return render_template("base.html")
+
+@app.route("/upgrade")
+def upgrade():
+    return render_template("base.html")
+
+@app.route("/tasks")
+def tasks():
+    return render_template("base.html")
+
 
 @app.route("/logging", methods=["POST"])
 def logging():

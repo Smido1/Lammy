@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clicker Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+
+    {% block head %}{% endblock %}
+
+</head>
+<body>
+    <div class="content">
+    {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <div class="menu">
+            <button onclick="menuClick('store')">Store</button>
+            <button onclick="menuClick('')">Home</button>
+            <button onclick="menuClick('upgrade')">Upgrade</button>
+            <button onclick="menuClick('tasks')">Tasks</button>
+        </div>
+    </footer>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        user_id = params.get("user_id");
+
+        function menuClick(tabUrl) {
+            window.location.href = "/" + tabUrl + "?user_id=" + user_id;
+        }
+    </script>
+
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>

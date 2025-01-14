@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='game.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<header>
+    <div id="score">Score: 0</div>
+</header>
+<main>
+    <div class="click-button" id="click-button" onclick="handleClick()">
+        <span id="start-button-text" class="start-button-text">START</span>
+    </div>
+    <div class="level" id="level">Level 1</div>
+</main>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    let score = 0;
+    let level = 1;
+    let disabled = false;
+
+    let accessToken = "";
+
+    logging();
+
+    function handleClick() {
+        const button = document.getElementById('click-button');
+        const button_text = document.getElementById('start-button-text');
+
+        // Увеличиваем очки
+        if (!disabled) {
+            score++;
+            showScore();
+            
+            // Деактивируем кнопку
+            disabled = true;
+            let remainingTime = 20;
+            button_text.textContent = `${remainingTime} seconds`;
+            
+            // Таймер
+            const interval = setInterval(() => {
+                remainingTime--;
+                button_text.textContent = `${remainingTime} seconds`;
+                if (remainingTime <= 0) {
+                    clearInterval(interval);
+                    disabled = false;
+                    button_text.textContent = 'START';
+                }
+            }, 1000);
+
+            sendMessageAboutClickToServer();
+        }
+    
+
+    }
+
+
+    async function logging() {
+        const params = new URLSearchParams(window.location.search);
+        user_id = params.get("user_id"); 
+
+        const response = await fetch('/logging', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id }),
+        });
+        const data = await response.json();
+        console.log(data);
+        accessToken = data.access_token; // Сохраняем токен
+
+        getValues();
+    }
+    async function getValues() {
+        // Отправляем GET-запрос с токеном авторизации
+        const response = await fetch('/get_values', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}` // Вставляем токен в заголовок
+            }
+        });
+
+        const data = await response.json(); // Преобразуем ответ в JSON
+        console.log(data);
+        if (data.status = "success") {
+            score = data.score;
+            showScore();
+        }
+    }
+    async function sendMessageAboutClickToServer() {
+        const response = await fetch('/click', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}`},
+            body: JSON.stringify({ user_id }),
+        });
+    }
+
+
+    function showScore() {
+        document.getElementById('score').textContent = `Score: ${score}`;
+    }
+
+</script>
+
+{% endblock %}
