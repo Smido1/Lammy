@@ -1,0 +1,69 @@
+header {
+    margin-top: 3%;
+    width: 100%;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 24px;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    flex-grow: 1;
+    width: 90%;
+}
+
+.upgrade-button {
+    margin-top: 10pt;
+    padding: 10px;
+    background-color: #11111b;
+    filter: drop-shadow(0 0 0.15rem #788284);
+    border-radius: 13px;
+    cursor: pointer;
+    transition: 200ms ease-in-out;
+    transition-property: all;
+    width: 100%;
+    height: 60pt;
+}
+
+.upgrade-icon {
+    /* padding: 8px; */
+    background-color: #11111b;
+    filter: drop-shadow(0 0 0.25rem #8BE9FD);
+    border-radius: 13px;
+    border: #8BE9FD solid 5px;
+    cursor: pointer;
+    transition: 200ms ease-in-out;
+    transition-property: all;
+    height: 100%;
+    box-sizing: border-box;
+    aspect-ratio: 1 / 1;
+    color: #8BE9FD;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    font-size: 30pt;
+}
+
+.yellow-border {
+    filter: drop-shadow(0 0 0.25rem #c4f513);
+    border-color: #c4f513;
+}
+
+.pink-border {
+    filter: drop-shadow(0 0 0.25rem #f513d3);
+    border-color: #f513d3;
+}
+
+.green-border {
+    filter: drop-shadow(0 0 0.25rem #13f557);
+    border-color: #13f557;
+}
+
+.red-border {
+    filter: drop-shadow(0 0 0.25rem #ff0000);
+    border-color: #ff0000;
+}

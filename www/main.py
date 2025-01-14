@@ -50,15 +50,15 @@ def index():
 
 @app.route("/store")
 def store():
-    return render_template("base.html")
+    return render_template("store.html")
 
 @app.route("/upgrade")
 def upgrade():
-    return render_template("base.html")
+    return render_template("upgrades.html")
 
 @app.route("/tasks")
 def tasks():
-    return render_template("base.html")
+    return render_template("tasks.html")
 
 
 @app.route("/logging", methods=["POST"])
