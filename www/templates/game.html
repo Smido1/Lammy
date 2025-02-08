@@ -21,6 +21,7 @@
 {% block scripts %}
 
 <script>
+    let preloaderIsClose = false;
     let score = 0;
     let level = 1;
     let disabled = false;
@@ -95,6 +96,9 @@
             showScore();
             updateTimer();
         }
+        if (!preloaderIsClose) {
+            setTimeout(closePreloader, 700);
+        }
     }
     async function sendMessageAboutClickToServer() {
         const response = await fetch('/click', {
@@ -121,6 +125,12 @@
     }
     function showScore() {
         document.getElementById('score').textContent = `Score: ${score}`;
+    }
+
+    function closePreloader() {
+        document.querySelector('.preloader').style.display = 'none';
+        document.querySelector('.content').style.display = 'block';
+        document.querySelector('footer').style.display = 'block';
     }
 
 </script>

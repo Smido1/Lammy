@@ -9,11 +9,15 @@
 
 </head>
 <body>
-    <div class="content">
+    <div class="preloader">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="content" style="display: none;">
     {% block content %}{% endblock %}
     </div>
 
-    <footer>
+    <footer style="display: none;">
         <div class="menu">
             <button onclick="menuClick('store')">Store</button>
             <button onclick="menuClick('')">Home</button>
