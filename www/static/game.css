@@ -33,6 +33,8 @@ main {
     cursor: pointer;
     transition: 200ms ease-in-out;
     transition-property: all;
+    width: 90pt;
+    text-align: center;
 }
 
 .click-button:hover {

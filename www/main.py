@@ -65,27 +65,38 @@ def tasks():
 def logging():
     data = request.get_json()
     user_id = data.get("user_id")
+    remaining_time = 0
+
     if Users.query.filter_by(id=user_id).first():
-        pass
+        try:
+            print("logging")
+        except:
+            print("error logging")
     else:
         try:
-            new_user = Users(id=user_id, coins=0)
+            new_user = Users(id=user_id, coins=0, last_click=datetime.min)
             db.session.add(new_user)
             db.session.commit()
         except:
             db.session.rollback()
     
     access_token = create_access_token(identity=user_id)
-    return jsonify({"status": "success", "message": "User logged!", "access_token": access_token})
+    return jsonify({"status": "success", "message": "User logged!", "access_token": access_token, "remaining_time": remaining_time})
 
 @app.route("/get_values", methods=["GET"])
 @jwt_required()
 def get_values():
     current_user_id = get_jwt_identity()  # Получение текущего пользователя из JWT
     user = Users.query.filter_by(id=current_user_id).first()
+    print(user)
+    last_click = user.last_click if user.last_click is not None else datetime.min
+    remaining_time = 20 - (datetime.now() - last_click).total_seconds()
+    remaining_time = round(remaining_time, 1)
+
     return jsonify({
         "status": "success",
-        "score": user.coins
+        "score": user.coins,
+        "remaining_time": remaining_time
     })
 
 @app.route("/click", methods=["POST"])
@@ -97,7 +108,9 @@ def click():
         if (datetime.now() - user.last_click).total_seconds() >= 20:
             user.coins += 1
             user.last_click = datetime.now()
-        db.session.commit()
+            db.session.commit()
+        else:
+            return jsonify({"status": "error", "message": "Too fast!"})
     except:
         print("error")
         db.session.rollback()
