@@ -1,3 +1,5 @@
+<!-- [ ] Проверка ответа сервера success/error -->
+
 {% extends "base.html" %}
 
 {% block head %}
@@ -26,13 +28,14 @@
     let level = 1;
     let disabled = false;
     let remainingTime = 20.0;
+    let timeOut = 20;
 
     let accessToken = "";
 
     const timer = setInterval(() => {
                 remainingTime -= 0.1;
                 remainingTime = remainingTime.toFixed(1);
-                if (remainingTime <= 0 && remainingTime > 20) {
+                if (remainingTime <= 0 && remainingTime > timeOut) {
                     clearInterval(timer);
                     disabled = false;
                 }
@@ -51,7 +54,7 @@
                 
                 // Деактивируем кнопку
                 disabled = true;
-                remainingTime = 20.0;
+                remainingTime = timeOut;
                 updateTimer();
                 
                 // Таймер
@@ -73,11 +76,15 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_id }),
         });
-        const data = await response.json();
-        console.log(data);
-        accessToken = data.access_token; // Сохраняем токен
 
-        getValues();
+        const data = await response.json();
+        if (data.status == "success") {
+            accessToken = data.access_token; // Сохраняем токен
+            getValues();
+            console.log("User logged in");
+        } else {
+            console.log("User not logged in");
+        }
     }
     async function getValues() {
         // Отправляем GET-запрос с токеном авторизации
@@ -89,10 +96,11 @@
         });
 
         const data = await response.json(); // Преобразуем ответ в JSON
-        console.log(data);
         if (data.status = "success") {
             score = data.score;
             remainingTime = data.remaining_time;
+            timeOut = data.time_out;
+            console.log(timeOut);
             showScore();
             updateTimer();
         }
@@ -112,9 +120,7 @@
 
     function updateTimer() {
         const button_text = document.getElementById('start-button-text');
-        console.log(remainingTime);
-        console.log("ut");
-        if (remainingTime < 20 && remainingTime > 0) {
+        if (remainingTime < timeOut && remainingTime > 0) {
             button_text.textContent = `${remainingTime}`;
             disabled = true;
             setInterval(timer);
