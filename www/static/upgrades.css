@@ -13,7 +13,7 @@ main {
     align-items: center;
     justify-content: start;
     flex-grow: 1;
-    width: 90%;
+    width: 100%;
 }
 
 .upgrade-button {
@@ -25,8 +25,10 @@ main {
     cursor: pointer;
     transition: 200ms ease-in-out;
     transition-property: all;
-    width: 100%;
+    width: 80%;
     height: 60pt;
+    display: flex;
+    justify-content: space-between;
 }
 
 .upgrade-icon {
@@ -46,6 +48,34 @@ main {
     align-items: center;
     display: flex;
     font-size: 30pt;
+}
+
+.upgrade-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    color: #f8f8f2;
+}
+
+.upgrade-text {
+    font-size: 14pt;
+    color: #f8f8f2;
+}
+
+.upgrade-action {
+    padding: 8px 16px;
+    background-color: #8BE9FD;
+    color: #11111b;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 200ms ease-in-out;
+    font-size: 12pt;
+}
+
+.upgrade-action:hover {
+    background-color: #5ac8e8;
 }
 
 .yellow-border {

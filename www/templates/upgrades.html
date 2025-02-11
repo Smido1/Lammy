@@ -13,6 +13,8 @@
 <main>
     <div class="upgrade-button">
         <div class="upgrade-icon"><i class="fas fa-home"></i></div>
+        <span class="upgrade-text">Уменьшение времени таймера на 10%</span>
+        <button class="upgrade-action">Улучшить</button>
     </div>
     <div class="upgrade-button">
         <div class="upgrade-icon yellow-border"><i class="fa-solid fa-bolt"></i></div>
@@ -31,5 +33,15 @@
 {% endblock %}
 
 {% block scripts %}
+
+<script>
+    setTimeout(closePreloader, 700);
+
+    function closePreloader() {
+        document.querySelector('.preloader').style.display = 'none';
+        document.querySelector('.content').style.display = 'block';
+        document.querySelector('footer').style.display = 'block';
+    }
+</script>
 
 {% endblock %}
