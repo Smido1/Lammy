@@ -42,19 +42,7 @@ class Users(db.Model):
 # Страницы
 @app.route("/")
 def index():
-    return render_template("game.html")
-
-@app.route("/store")
-def store():
-    return render_template("store.html")
-
-@app.route("/upgrade")
-def upgrade():
-    return render_template("upgrades.html")
-
-@app.route("/tasks")
-def tasks():
-    return render_template("tasks.html")
+    return render_template("base.html")
 
 
 # API
@@ -84,7 +72,6 @@ def logging():
 @app.route("/get_values", methods=["GET"])
 @jwt_required()
 def get_values():
-
     current_user_id = get_jwt_identity()  # Получение текущего пользователя из JWT
     logger.info("📩 Запрос данных про пользователя " + str(current_user_id))
     user = Users.query.filter_by(id=current_user_id).first()

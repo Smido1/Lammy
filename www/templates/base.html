@@ -1,11 +1,18 @@
+<!-- [ ] Проверка ответа сервера success/error -->
+
 <!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clicker Game</title>
+    <!-- Base -->
     <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+    <!-- Game -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='game.css') }}">
+    <!-- Upgrades -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='upgrades.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    {% block head %}{% endblock %}
 
 </head>
 <body>
@@ -14,28 +21,184 @@
     </div>
 
     <div class="content" style="display: none;">
-    {% block content %}{% endblock %}
+        <div id="game" class="tab-content">
+            <header>
+                <div id="score">Score: 0</div>
+            </header>
+            <main>
+                <div class="click-button" id="click-button" onclick="handleClick()">
+                    <span id="start-button-text" class="start-button-text">START</span>
+                </div>
+                <div class="level" id="level">Level 1</div>
+            </main>
+        </div>
+        
+        <div id="upgrades" class="tab-content" style="display: none;">
+            <header>
+                <div>UPGRADES</div>
+            </header>
+            <main>
+                <div class="upgrade-button">
+                    <div class="upgrade-icon"><i class="fas fa-home"></i></div>
+                    <span class="upgrade-text">Уменьшение времени таймера на 10%</span>
+                    <button class="upgrade-action">Улучшить</button>
+                </div>
+                <div class="upgrade-button">
+                    <div class="upgrade-icon yellow-border"><i class="fa-solid fa-bolt"></i></div>
+                </div>
+                <div class="upgrade-button">
+                    <div class="upgrade-icon pink-border"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                </div>
+                <div class="upgrade-button">
+                    <div class="upgrade-icon green-border"><i class="fa-regular fa-heart"></i></div>
+                </div>
+                <div class="upgrade-button">
+                    <div class="upgrade-icon red-border"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                </div>
+            </main>
+        </div>
     </div>
 
     <footer style="display: none;">
         <div class="menu">
-            <button onclick="menuClick('store')">Store</button>
-            <button onclick="menuClick('')">Home</button>
-            <button onclick="menuClick('upgrade')">Upgrade</button>
-            <button onclick="menuClick('tasks')">Tasks</button>
+            <button onclick="menuClick('game')">Home</button>
+            <button onclick="menuClick('upgrades')">Upgrade</button>
         </div>
     </footer>
 
+    <!-- Base -->
     <script>
-        const params = new URLSearchParams(window.location.search);
-        user_id = params.get("user_id");
+        let preloaderIsClose = false;
+        let score = 0;
+        let level = 1;
+        let disabled = false;
+        let remainingTime = 20.0;
+        let timeOut = 20;
+    
+        let accessToken = "";
 
-        function menuClick(tabUrl) {
-            window.location.href = "/" + tabUrl + "?user_id=" + user_id;
+        logging();
+        
+        function handleClick() {
+            // Увеличиваем очки
+            if (!disabled) {
+                if (sendMessageAboutClickToServer()) {   
+                    score++;
+                    showScore();
+                    
+                    // Деактивируем кнопку
+                    disabled = true;
+                    remainingTime = timeOut;
+                    updateTimer();
+                    
+                    // Таймер
+                    setInterval(timer);
+                    updateTimer();
+                }
+            }
+        }
+        function closePreloader() {
+            document.querySelector('.preloader').style.display = 'none';
+            document.querySelector('.content').style.display = 'block';
+                document.querySelector('footer').style.display = 'block';
+            }
+        function menuClick(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            document.getElementById(tabName).style.display = 'block';
+        }
+ 
+        async function logging() {
+            const params = new URLSearchParams(window.location.search);
+            user_id = params.get("user_id"); 
+
+            const response = await fetch('/logging', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id }),
+            });
+
+            const data = await response.json();
+            if (data.status == "success") {
+                accessToken = data.access_token; // Сохраняем токен
+                getValues();
+                console.log("User logged in");
+            } else {
+                console.log("User not logged in");
+            }
+        }
+        async function getValues() {
+            // Отправляем GET-запрос с токеном авторизации
+            const response = await fetch('/get_values', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}` // Вставляем токен в заголовок
+                }
+            });
+
+            const data = await response.json(); // Преобразуем ответ в JSON
+            if (data.status = "success") {
+                score = data.score;
+                remainingTime = data.remaining_time;
+                timeOut = data.time_out;
+                console.log(timeOut);
+                showScore();
+                updateTimer();
+            }
+            if (!preloaderIsClose) {
+                setTimeout(closePreloader, 700);
+            }
+        }
+
+    </script>
+    <!-- Game -->
+    <script>
+        const timer = setInterval(() => {
+            remainingTime -= 0.1;
+            remainingTime = remainingTime.toFixed(1);
+            if (remainingTime <= 0 && remainingTime > timeOut) {
+                clearInterval(timer);
+                disabled = false;
+            }
+            updateTimer();
+        }, 100);
+
+        async function sendMessageAboutClickToServer() {
+            const response = await fetch('/click', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}`},
+                body: JSON.stringify({ user_id }),
+            });
+            const data = await response.json();   
+            return data.status == "success";    
+        }
+
+        function updateTimer() {
+            const button_text = document.getElementById('start-button-text');
+            if (remainingTime < timeOut && remainingTime > 0) {
+                button_text.textContent = `${remainingTime}`;
+                disabled = true;
+                setInterval(timer);
+            } else {
+                button_text.textContent = 'START';
+                disabled = false;
+            }
+        }
+        function showScore() {
+            document.getElementById('score').textContent = `Score: ${score}`;
+        }
+        
+    </script>
+    <!-- Upgrades -->
+    <script>
+        setTimeout(closePreloader, 700);
+
+        function closePreloader() {
+            document.querySelector('.preloader').style.display = 'none';
+            document.querySelector('.content').style.display = 'block';
+            document.querySelector('footer').style.display = 'block';
         }
     </script>
-
-    {% block scripts %}{% endblock %}
-
 </body>
 </html>
